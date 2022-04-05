@@ -8190,15 +8190,13 @@ namespace Thetis
             //    BroadcastFreqChange("A", freq);
         }
 
-        private void BroadcastFreqChange(string vfo, string freq)
+        private void BroadcastFreqChange(string vfo, double freq)
         {
-            string cmd = "F" + vfo + freq.Replace(separator, "").PadLeft(11, '0') + ";";
+            string cmd = "F" + vfo + freq.ToString("f6").Replace(separator, "").PadLeft(11, '0') + ";"; // MW0LGE_21k9d changed to double being passed in
             if (Siolisten != null && Siolisten.SIO != null)
             {
-                //byte[] bfreq = ASCIIEncoding.ASCII.GetBytes(freq);
                 try
                 {
-                    // siolisten.SIO.put(bfreq, (uint)bfreq.Length);
                     if (Siolisten.SIO.IsOpen) Siolisten.SIO.put(cmd);
                 }
                 catch { }
@@ -33408,14 +33406,7 @@ namespace Thetis
             UpdatePreamps();
             
             //MW0LGE_21d
-            if (/*oldBand != RX1Band ||
-                oldMode != RX1DSPMode ||
-                oldFilter != RX1Filter ||*/
-                dOldFreq != VFOAFreq// ||
-                /*oldCentreFreq != CentreFrequency ||
-                oldCtun != ClickTuneDisplay ||
-                oldZoomSlider != ptbDisplayZoom.Value*/
-                )
+            if (dOldFreq != VFOAFreq)
                 VFOAFrequencyChangeHandlers?.Invoke(oldBand, RX1Band, oldMode, RX1DSPMode, oldFilter, RX1Filter, dOldFreq, VFOAFreq,
                     oldCentreFreq, CentreFrequency, oldCtun, ClickTuneDisplay, oldZoomSlider, ptbDisplayZoom.Value, radio.GetDSPRX(0, 0).RXOsc, 1);
         }
@@ -34430,17 +34421,8 @@ namespace Thetis
             last_tx_xvtr_index = tx_xvtr_index;
             last_rx2_xvtr_index = rx2_xvtr_index;
 
-            //MW0LGE_21b
-            //if(bOldFreq != Math.Round(VFOBFreq,6)) VFOBFrequencyChangeHandlers?.Invoke(bOldFreq, Math.Round(VFOBFreq, 6), oldBand, RX2Band);
             //MW0LGE_21d
-            if (/*oldBand != RX2Band ||
-                oldMode != RX2DSPMode ||
-                oldFilter != RX2Filter ||*/
-                dOldFreq != VFOBFreq //||
-                /*oldCentreFreq != CentreRX2Frequency ||
-                oldCtun != ClickTuneRX2Display ||
-                oldZoomSlider != ptbDisplayZoom.Value*/
-                )
+            if (dOldFreq != VFOBFreq)
                 VFOBFrequencyChangeHandlers?.Invoke(oldBand, RX2Band, oldMode, RX2DSPMode, oldFilter, RX2Filter, dOldFreq, VFOBFreq,
                     oldCentreFreq, CentreRX2Frequency, oldCtun, ClickTuneRX2Display, oldZoomSlider, ptbDisplayZoom.Value, RX2Enabled ? radio.GetDSPRX(1, 0).RXOsc : radio.GetDSPRX(0, 0).RXOsc, RX2Enabled ? 2 : 1);
         }
@@ -40581,6 +40563,7 @@ namespace Thetis
                 panelVFOASubHover.Visible = false;
             }
         }
+        private bool _bOldVFOSplit = false;
         private void chkVFOSplit_CheckedChanged(object sender, System.EventArgs e)
         {
             Display.SplitEnabled = chkVFOSplit.Checked;
@@ -40699,7 +40682,11 @@ namespace Thetis
 #endif
 			AndromedaIndicatorCheck(EIndicatorActions.eINSplit, false, chkVFOSplit.Checked);
 
-            SplitChangedHandlers?.Invoke(1, chkVFOSplit.Checked);
+            if (_bOldVFOSplit != chkVFOSplit.Checked) //MW0LGE_21k9d
+            {
+                SplitChangedHandlers?.Invoke(1, _bOldVFOSplit, chkVFOSplit.Checked);
+                _bOldVFOSplit = chkVFOSplit.Checked;
+            }
         }
 
 
@@ -50829,7 +50816,7 @@ namespace Thetis
 
         #region NewDelegateSystem
         //-------------------------------
-        // MW0LGE_21b A move towards delegate/event based system? Used by quickrecall currently
+        // MW0LGE_21b A move towards delegate/event based system
         public delegate void BandPreChange(int rx, Band band);
         public delegate void BandNoChange(int rx, Band band);
         public delegate void BandChanged(int rx, Band oldBand, Band newBand);
@@ -50850,7 +50837,7 @@ namespace Thetis
         public delegate void PreampModeChanged(int rx, PreampMode oldMode, PreampMode newMode);
 
         public delegate void FilterEdgesChanged(int rx, Filter filter, Band band, int low, int high);
-        public delegate void SplitChanged(int rx, bool newSplit);
+        public delegate void SplitChanged(int rx, bool oldSplit, bool newSplit);
         public delegate void TuneChanged(int rx, bool oldTune, bool newTune);
         public delegate void DrivePowerChanged(int rx, int newPower, bool tune);
         public delegate void SampleRateChanged(int rx, int oldSampleRate, int newSampleRate);
@@ -50897,8 +50884,8 @@ namespace Thetis
 
         private bool m_bIgnoreFrequencyDupes = false;               // if an update is to be made, but the frequency is already in the filter, ignore it
         private bool m_bHideBandstackWindowOnSelect = false;        // hide the window if an entry is selected
-        private bool m_bShowBandStackOverlays = false;                     // show bandstack entries on the spectrum
-        private bool m_bBandStackOverlayClicked = false;        // we have clicked an overlay
+        private bool m_bShowBandStackOverlays = false;              // show bandstack entries on the spectrum
+        private bool m_bBandStackOverlayClicked = false;            // we have clicked an overlay
         private void addDelegates()
         {
             m_frmNotchPopup.NotchDeleteEvent += onNotchDelete;
@@ -51040,7 +51027,7 @@ namespace Thetis
         {
 
         }
-        private void OnSplitChanged(int rx, bool newSplit)
+        private void OnSplitChanged(int rx, bool oldSplit, bool newSplit)
         {
 
         }
@@ -51453,7 +51440,7 @@ namespace Thetis
 
             //cat broadcast for kenwood AI
             if (KWAutoInformation)
-                BroadcastFreqChange("A", newFreq.ToString());
+                BroadcastFreqChange("A", newFreq);
 
             handleChange(oldBand, newBand, oldMode, newMode, oldFilter, newFilter, oldFreq, newFreq, oldCentreF, newCentreF, oldCTUN, newCTUN, oldZoomSlider, newZoomSlider);
         }
@@ -51467,7 +51454,7 @@ namespace Thetis
 
             //cat broadcast for kenwood AI
             if (KWAutoInformation)
-                BroadcastFreqChange("B", newFreq.ToString());
+                BroadcastFreqChange("B", newFreq);
 
             //Debug.Print("vfoB changed : old:" + oldFreq.ToString() + "   new:" + newFreq.ToString());
         }

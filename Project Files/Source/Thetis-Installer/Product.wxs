@@ -88,7 +88,7 @@
             Note: Under a Product element, a condition becomes a LaunchCondition entry. 
       -->
     <Condition Message="!(loc.OS2Old)">
-      <![CDATA[Installed OR (VersionNT >= 603)]]>
+      <![CDATA[Installed OR (VersionNT >= 601)]]>
     </Condition>
 
     <?if $(var.Platform) = x64 ?>
@@ -255,12 +255,12 @@
               />
       </Component>
 
-      <!--<Component Guid="*">
-        <File Id="calculus"
-              Source="$(var.FilesPath)calculus"
+      <Component Guid="*">
+        <File Id="WindowsFirewallHelper"
+              Source="$(var.FilesPath)WindowsFirewallHelper.dll"
               KeyPath="yes"
               />
-      </Component>-->
+      </Component>
 
       <Component Guid="*">
         <File Id="Midi2CatDLL"

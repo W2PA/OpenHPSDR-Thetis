@@ -33,7 +33,7 @@
     <GenerateManifests>false</GenerateManifests>
     <SignManifests>false</SignManifests>
     <TargetZone>LocalIntranet</TargetZone>
-    <ApplicationManifest>app1.manifest</ApplicationManifest>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <PublishUrl>C:\Documents and Settings\w5wc\Desktop\PowerSDR 1.19.3\publish\</PublishUrl>
@@ -618,7 +618,6 @@
     <Content Include="thetis-icon.ico" />
     <None Include="Resources\thetis-logo1.png" />
     <None Include="Resources\cross_rl.cur" />
-    <None Include="app1.manifest" />
     <None Include="Resources\info.png" />
     <None Include="Resources\lock_locked_red.png" />
     <None Include="Resources\return_green.png" />

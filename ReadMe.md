@@ -1,5 +1,9 @@
 
-# Latest Release v2.9.0 April 03, 2022
+# Latest Release v2.9.0.2 April 04, 2022
+
+# 2.9.0.2 (2022-04-04)
+- added missing firewall dll
+- fixed backward Windows compatiblity to Windows 7
 
 # 2.9.0 (2022-03-04)
 See [ Thetis Change Log ](https://github.com/TAPR/OpenHPSDR-Thetis/blob/master/Thetis%20v2.9.0%20Change%20Log.pdf) for more details.

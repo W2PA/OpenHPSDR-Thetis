@@ -1,5 +1,8 @@
 
-# Latest Release v2.9.0.2 April 04, 2022
+# Latest Release v2.9.0.3 April 04, 2022
+
+# 2.9.0.3 (2022-04-04)
+- added fixes up to 21k9d(pre)
 
 # 2.9.0.2 (2022-04-04)
 - added missing firewall dll
